@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTok Overlay - 3 Vulpite Sincronizate</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent !important;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .linie-vulpi {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px; 
+            opacity: 0; 
+            transition: opacity 0.5s ease-in-out; /* MODIFICAT: Efectul de fade durează acum 0.5 secunde */
+        }
+
+        video {
+            object-fit: contain;
+            background: transparent !important;
+        }
+
+        #vulpest {
+            width: 70px;
+            height: 60px;
+        }
+
+        #vulpecentru {
+            width: 180px;
+            height: 170px;
+        }
+
+        #vulpedr {
+            width: 70px;
+            height: 60px;
+        }
+
+        .vizibil {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="linieContainer" class="linie-vulpi">
+        <video id="vulpest" muted playsinline loop>
+            <source src="vulpest.webm" type="video/webm">
+        </video>
+        <video id="vulpecentru" muted playsinline loop>
+            <source src="vulpecentru.webm" type="video/webm">
+        </video>
+        <video id="vulpedr" muted playsinline loop>
+            <source src="vulpedr.webm" type="video/webm">
+        </video>
+    </div>
+
+    <script>
+        const container = document.getElementById('linieContainer');
+        const vStanga = document.getElementById('vulpest');
+        const vCentru = document.getElementById('vulpecentru');
+        const vDreapta = document.getElementById('vulpedr');
+        
+        const TIMP_ASTEPTARE = (1 * 60 + 30) * 1000; // 1.5 minute de pauză
+        const TIMP_RULARE = 15 * 1000;               // MODIFICAT: 15 secunde de funcționare
+        const TIMP_FADE = 500;                       // MODIFICAT: 0.5 secunde (tranziția CSS)
+
+        function pornesteToate() {
+            // Repornim clipurile de la început și le dăm play
+            [vStanga, vCentru, vDreapta].forEach(video => {
+                video.currentTime = 0;
+                video.play().catch(err => console.log("Așteaptă interacțiune/click în browser"));
+            });
+            
+            // Afișăm containerul pe ecran (va apărea treptat în 0.5 secunde datorită CSS-ului)
+            container.classList.add('vizibil');
+
+            // Cu 0.5 secunde înainte de expirarea timpului total, aplicăm efectul de dispariție (fade-out)
+            setTimeout(() => {
+                container.classList.remove('vizibil');
+            }, TIMP_RULARE - TIMP_FADE);
+
+            // După fix 15 secunde, punem pauză clipurilor și programăm următoarea apariție
+            setTimeout(() => {
+                [vStanga, vCentru, vDreapta].forEach(video => {
+                    video.pause();
+                });
+                
+                // Declanșăm o nouă rulare după perioada de așteptare de 1.5 minute
+                setTimeout(pornesteToate, TIMP_ASTEPTARE);
+            }, TIMP_RULARE);
+        }
+
+        // Pornirea inițială automată în browser / TikTok Studio
+        window.addEventListener('load', () => {
+            setTimeout(pornesteToate, 500); 
+        });
+    </script>
+
+</body>
+</html>
